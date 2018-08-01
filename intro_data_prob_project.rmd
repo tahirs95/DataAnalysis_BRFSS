@@ -1,0 +1,91 @@
+---
+title: "Exploring the BRFSS data"
+output: 
+  html_document: 
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(ggplot2)
+library(dplyr)
+```
+
+### Load data
+
+Make sure your data and R Markdown files are in the same directory. When loaded
+your data file will be called `brfss2013`. Delete this note when before you submit 
+your work. 
+
+```{r load-data}
+load("brfss2013.RData")
+```
+
+
+
+* * *
+
+## Part 1: Data
+The mode of data collection was interviewing through landline or cell phone. The sampling that was conducted here is random in nature since, the study here is totally observational instead of experimental because the researcher has performed it under no conditions due to which no sort of biasness or random assignment exists here. We infer that due to conduction of random sampling, it is totally generalisable and correlation among variables exists here instead of causality. Since, the interviewees are only the ones who have telephone access we can't say that the results are totally generalisable so, that is the probable source of bias here.
+
+* * *
+
+## Part 2: Research questions
+
+**Research quesion 1:**
+My aim is to look for those gender classified people who are have difficulty in concentrating and remembering provided that they are suffering from both mental and physical illness for more than half a month, who sleep for less than 6 hours and who are suffering from restlessness all, most or some of of the time. I am interested to know the count of such people because I want to see the impact of physical difficulty, mental difficulty and restlessness on difficulty in concentrating and remembering. 
+(Note that minimum sleep time is 6 hours per day for an individual)
+
+**Research quesion 2:**
+My motive is to view the classification of those people who belong to various classes of income provided that they have 4 or more years of education, who are employed and who work for more than 30 hours per week. I am eager to know the trend of the incomes of people with such characteristics specially those people who have lower incomes despite the fact that they are significantly educated. This could draw our attention towards identifying the potential reasons as to why their incomes are low.
+
+**Research quesion 3:**
+I want to figure out the count of people who exist in various classes of weights provided that they consume suger sweetened drinks, who have difficulty in walking and who exercise as well. I am interested to know the ratio of obese people here despite the fact that they exercise, have difficulty in walking and consume sweetened drinks. This could help us take some measures to help them lose weight to overcome obesity.
+
+* * *
+
+## Part 3: Exploratory data analysis
+
+
+
+**Research quesion 1:**
+
+```{r}
+a <- brfss2013 %>%
+  group_by(decide,sex) %>%
+  filter(physhlth>15 ,menthlth>15,sleptim1<6,misrstls=="All" | misrstls=="Most" | misrstls=="Some", !is.na(decide)) %>%
+  summarise(count=n())
+ggplot(data=a,aes(x=decide,y=count,fill=sex))+geom_bar(stat="identity",position=position_dodge())
+```
+
+**Conclusion:**
+By the results being reflected from the bar chart we can observe that the proportion of those people who have difficulty in concentrating and remembering is greater then those who do not encounter such difficulty provided that they are subject to mental and physical illness for more than half a month, sleep for less than 6 hours and who are suffering from restlessness all, most or some of of the time. Being gender specific we can conclude that among the sufferers, majority of them are females. By these results, we can ponder upon as to why their are more female effectees as compared to males.
+
+**Research quesion 2:**
+
+
+```{r}
+b <- brfss2013 %>%
+  group_by(income2) %>%
+  filter(educa=="College 4 years or more (College graduate)",employ1=="Employed for wages" | employ1=="Self-employed",!is.na(income2),scntwrk1>30) %>%
+  summarise(count=n())
+ggplot(data=b,aes(x=income2,y=count))+geom_bar(stat="identity")
+```
+
+
+**Research quesion 3:**
+
+```{r}
+c <- brfss2013 %>%
+  group_by(X_bmi5cat) %>%
+  filter(ssbfrut2!=0 & !is.na(ssbfrut2),diffwalk=="Yes",!is.na(X_bmi5cat),exerany2=="Yes") %>%
+  summarise(count=n())
+ggplot(data=c,aes(x=X_bmi5cat,y=count))+geom_bar(stat="identity")
+```
+
+
